@@ -1,42 +1,64 @@
-import { Component } from 'react';
+import React from 'react';
+import { useFormik } from 'formik';
 import {FormCard, FormBox, InputName, Input, Button} from './FormStyle'
 
-
- class CreateContactForm extends Component {
-    state ={
+const CreateContactForm = ({addContact}) => {
+  const formik = useFormik({
+    initialValues: {
       name: '',
-     number: ''
-    }
-     handleSubmit = (e) => {
-        e.target.reset()
-        e.preventDefault()
-        this.props.addContact(this.state)
-        
-        
-    }
-     handleChange = ({ target: { value, name } }) => {
-       //  {name.number isInteger}
-        this.setState({[name]:value})
-    }
-     render() {
-   // console.log(this.state);
+      number: '',
+    },
+      onSubmit: values => {
+          formik.resetForm();
+       // e.preventDefault()
+        addContact(values)
+      //alert(JSON.stringify(values, null, 2));
+      },
+      validate:values=>{
+          let errors = {
+          };
+ if(!values.name){
+  errors.name = 'Required!'
+ } 
+ else if (values.number.length > 0 ) {
+     if(!/\+?\d{1,4}?[ .\-\s]?\(?\d{1,3}?\)?[ .\-\s]?\d{1,4}[ .\-\s]?\d{1,4}[ .\-\s]?\d{1,9}/i.test(values.number)){
+errors.number = 'Invalid number format!'
+          }
+ }
+ return errors;
+},
+  });
     return (
-        <FormCard >
-            <form onSubmit={this.handleSubmit}>
-                <FormBox >
-                    <InputName >Name</InputName>
-                    <Input value={this.state.value} onChange={this.handleChange} type="text" name="name" required />
-                </FormBox>
-                <FormBox >
-                    <InputName>Number</InputName>
-                    <Input value={this.state.value} onChange={this.handleChange} type="tel"  name="number" required />
-                </FormBox>
-                <div >
-                    <Button  type="submit" >Add contact</Button>
-                </div>
+      <FormCard >
+            <form onSubmit={formik.handleSubmit}>
+    <FormBox>
+      <InputName htmlFor="firstName">Name</InputName>
+      {formik.errors.name&& <div className="error">{formik.errors.name}</div>}  
+      <Input
+      style={formik.errors.name &&{backgroundColor: 'red',}}
+        id="name"
+        name="name"
+        type="text"
+        onChange={formik.handleChange}
+        value={formik.values.name}
+      />
+    </FormBox>
+    <FormBox>
+       <InputName htmlFor="lastName">Number</InputName>
+    {formik.errors.number&& <div className="error">{formik.errors.number}</div>}   
+      <Input
+      style={formik.errors.number &&{backgroundColor: 'red',}}
+        id="number"
+        name="number"
+        type="text"
+        onChange={formik.handleChange}
+        value={formik.values.number}
+      />
+    </FormBox>
+      <Button type="submit">Submit</Button>
             </form>
-        </FormCard>
-    );
-}
-}
+            </FormCard>
+  );
+};
 export default CreateContactForm
+
