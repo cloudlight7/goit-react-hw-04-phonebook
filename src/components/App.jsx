@@ -1,5 +1,5 @@
 
-import { useState, useEffect, } from 'react';
+import { useState, useEffect, useMemo, } from 'react';
 import ContactForm from './Form/CreateContacts'
 import ContactList from './ContactList'
 import { nanoid } from 'nanoid'
@@ -14,7 +14,7 @@ export const App = () => {
   const addContact = (newContact) => {
     if (contacts.find(option => option.name === newContact.name)) {
       alert(`${newContact.name} is already in contact.`)
-      return
+      return 
     } else {
     const contactObj = {
       id:nanoid(),
@@ -31,20 +31,16 @@ export const App = () => {
       })
   }
   const filters = ({ target: { value } }) => {
-    setFilter(contacts.filter(name => name.name.toLowerCase().includes(value.toLowerCase())))
+    return setFilter(contacts.filter(name => name.name.toLowerCase().includes(value.toLowerCase())))
   }
+  useMemo(() => {
+  const dataLocStor = JSON.parse(localStorage.getItem('contacts'));
+      setContacts(dataLocStor)
+}, [])
   useEffect(() => { 
-    if (!!contacts.length) {
        localStorage.setItem('contacts', JSON.stringify(contacts))
-    }
   }, [contacts])
 
-useEffect(() => {
- const dataLocStor = JSON.parse(localStorage.getItem('contacts'));
-  if (dataLocStor) {
-      setContacts(dataLocStor)
-    } 
-}, [])
   return (
     <Sections>
   <h1>Phonebook</h1>
