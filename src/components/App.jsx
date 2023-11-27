@@ -9,8 +9,9 @@ import { Sections } from './SectionStyle'
 
 
 export const App = () => {
-  const [contacts, setContacts] = useState([])
-  const [filter, setFilter] = useState(null)
+  const [contacts, setContacts] = useState(JSON.parse(localStorage.getItem('contacts'))??[])
+  const [filter, setFilter] = useState('')
+
   const addContact = (newContact) => {
     if (contacts.find(option => option.name === newContact.name)) {
       alert(`${newContact.name} is already in contact.`)
@@ -31,16 +32,16 @@ export const App = () => {
       })
   }
   const filters = ({ target: { value } }) => {
-    return setFilter(contacts.filter(name => name.name.toLowerCase().includes(value.toLowerCase())))
+    return setFilter(value)
   }
-  useMemo(() => {
-  const dataLocStor = JSON.parse(localStorage.getItem('contacts'));
-      setContacts(dataLocStor)
-}, [])
   useEffect(() => { 
-       localStorage.setItem('contacts', JSON.stringify(contacts))
+    localStorage.setItem('contacts', JSON.stringify(contacts))
   }, [contacts])
 
+  const getFindContact = () => {
+    const normalizedFilter = filter.toLowerCase();
+    return contacts.filter(contact => contact.name.toLowerCase().includes(normalizedFilter)) 
+  }
   return (
     <Sections>
   <h1>Phonebook</h1>
@@ -48,7 +49,7 @@ export const App = () => {
 
         <h2>Contacts</h2>
         <Filter filter={filters} />
-      <ContactList contacts={filter ?? contacts} delContact={delContact} />
+      <ContactList contacts={getFindContact() ?? contacts} delContact={delContact} />
 </Sections>
   )
 }
